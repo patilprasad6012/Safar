@@ -1,0 +1,8 @@
+flask
+flask-mysqldb
+flask-bcrypt
+flask-session
+python-dotenv
+flask-wtf
+email-validator
+requests

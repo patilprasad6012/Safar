@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}Apply as Guide - Safar{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center pt-4">
+    <div class="col-md-8">
+        <div class="card-simple">
+            <h2 class="fw-bold mb-3 text-center text-success">Apply as a Local Guide</h2>
+            <p class="text-muted text-center mb-4">Share your knowledge with travelers, build your profile, and start guiding!</p>
+            
+            <form action="{{ url_for('guide.register') }}" method="POST">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label small fw-bold text-uppercase" style="letter-spacing: 0.5px; color: #64748b;">Full Name</label>
+                        <input type="text" name="full_name" class="form-control rounded-3" placeholder="Jane Cooper" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label small fw-bold text-uppercase" style="letter-spacing: 0.5px; color: #64748b;">Phone Number</label>
+                        <input type="tel" name="phone" class="form-control rounded-3" placeholder="+1 (555) 000-0000" required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-uppercase" style="letter-spacing: 0.5px; color: #64748b;">Email Address</label>
+                    <input type="email" name="email" class="form-control rounded-3" placeholder="jane@example.com" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-uppercase" style="letter-spacing: 0.5px; color: #64748b;">Password</label>
+                    <input type="password" name="password" class="form-control rounded-3" placeholder="••••••••" required>
+                </div>
+                
+                <h5 class="fw-bold mt-4 mb-3" style="color: #1e293b;">Your Expertise</h5>
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-uppercase" style="letter-spacing: 0.5px; color: #64748b;">Years of Experience & Destinations Covered</label>
+                    <textarea name="experience" class="form-control rounded-3" rows="3" placeholder="I have 5 years navigating the Himalayas..."></textarea>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label small fw-bold text-uppercase" style="letter-spacing: 0.5px; color: #64748b;">Short Bio (Why should travelers hire you?)</label>
+                    <textarea name="bio" class="form-control rounded-3" rows="3" placeholder="Passionate about local culture and hidden gems..."></textarea>
+                </div>
+                
+                <button type="submit" class="btn w-100 py-3 mb-3 fw-bold text-white shadow-sm" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: none; border-radius: 12px; transition: transform 0.2s;">
+                    Submit Application
+                </button>
+            </form>
+            
+            <div class="text-center">
+                <p class="text-muted small">Already a guide? <a href="{{ url_for('guide.login') }}" class="text-success text-decoration-none fw-bold">Login Here</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

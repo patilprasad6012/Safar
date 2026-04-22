@@ -1,0 +1,82 @@
+{% extends "user_base.html" %}
+
+{% block title %}Explore Tours - Safar{% endblock %}
+
+{% block user_content %}
+<div class="dashboard-header mb-4">
+    <div class="header-title">
+        <h2>Explore Destinations</h2>
+        <p>Discover our handpicked travel experiences from around the world.</p>
+    </div>
+</div>
+
+<!-- Filter Controls -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex align-items-center gap-2">
+        <h5 class="fw-bold m-0 text-dark">
+            {% if request.args.get('search') %}
+                Results for "{{ request.args.get('search') }}"
+            {% else %}
+                Available Packages
+            {% endif %}
+        </h5>
+        <span class="badge bg-primary-subtle text-primary rounded-pill">{{ packages|length }} packages</span>
+    </div>
+    
+    <form action="{{ url_for('packages') }}" method="GET" class="d-flex align-items-center bg-white border rounded-pill ps-3 pe-1 py-1 shadow-sm overflow-hidden">
+        {% if request.args.get('search') %}
+        <input type="hidden" name="search" value="{{ request.args.get('search') }}">
+        {% endif %}
+        <label class="small text-muted me-2 fw-bold text-nowrap ms-2">
+            <i data-lucide="filter" size="14"></i> Sort:
+        </label>
+        <select name="sort" class="form-select form-select-sm border-0 shadow-none fw-bold text-primary" onchange="this.form.submit()" style="cursor: pointer; background: transparent; min-width: 140px;">
+            <option value="recent" {% if request.args.get('sort') == 'recent' %}selected{% endif %}>Recently Added</option>
+            <option value="price_low" {% if request.args.get('sort') == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+            <option value="price_high" {% if request.args.get('sort') == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+        </select>
+    </form>
+</div>
+
+<div class="row g-4">
+    {% if packages %}
+        {% for p in packages %}
+        <div class="col-md-6 col-xl-4">
+            <div class="card-simple h-100 p-0 overflow-hidden border-0 shadow-sm" style="transition: transform 0.3s ease;">
+                <div style="height: 200px; overflow: hidden; position: relative;">
+                    <img src="{{ p.image_url }}" alt="Package" style="width: 100%; height: 100%; object-fit: cover;">
+                    <div class="position-absolute top-0 end-0 p-3">
+                        <span class="badge shadow-sm fw-bold px-3 py-2 rounded-pill" style="font-size: 0.9rem; background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%); color: white;">₹{{ p.price }}</span>
+                    </div>
+                    <div class="position-absolute bottom-0 start-0 p-3 w-100" style="background: linear-gradient(transparent, rgba(0,0,0,0.7));">
+                        <div class="text-white small fw-bold"><i data-lucide="map-pin" size="12" class="me-1"></i> {{ p.destination }}</div>
+                    </div>
+                </div>
+                <div class="p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="badge bg-primary-subtle text-primary border-0 rounded-pill px-3 py-1 small">
+                             <i data-lucide="clock" size="12" class="me-1"></i> {{ p.duration }}
+                        </div>
+                        <div class="text-muted small fw-bold">{{ p.available_slots }} left</div>
+                    </div>
+                    <h5 class="fw-bold mb-3 text-dark">{{ p.title }}</h5>
+                    <p class="text-muted small mb-4 text-truncate-2" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                        {{ p.description }}
+                    </p>
+                    <a href="{{ url_for('user.package_details', id=p.id) }}" class="btn btn-primary-custom w-100 rounded-pill py-2">
+                        View Details & Book
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12 py-5 text-center text-muted card-simple">
+            <i data-lucide="search-x" class="mb-3 d-block mx-auto opacity-25" size="64"></i>
+            <h5 class="fw-bold text-dark">No packages found</h5>
+            <p>Try adjusting your filters or search query.</p>
+            <a href="{{ url_for('packages') }}" class="btn btn-outline-primary rounded-pill mt-3 px-4">See All Packages</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

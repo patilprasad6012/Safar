@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% block title %}About Us - Safar{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+    body {
+        background-color: #fef8f5;
+        font-family: 'Outfit', sans-serif;
+    }
+
+    .about-header {
+        text-align: center;
+        padding: 60px 20px;
+        background: #fffafa;
+        border-bottom: 1px solid #fce4ec;
+        margin-bottom: 50px;
+    }
+
+    .about-header h1 {
+        font-family: 'Playfair Display', serif;
+        font-size: 3rem;
+        color: #1a1a1a;
+        margin-bottom: 10px;
+    }
+
+    .about-header p {
+        color: #8c8c8c;
+        font-size: 1rem;
+        letter-spacing: 0.5px;
+    }
+
+    .about-content-wrapper {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding-bottom: 80px;
+    }
+
+    .about-split {
+        display: flex;
+        gap: 60px;
+        align-items: center;
+    }
+
+    @media (max-width: 991px) {
+        .about-split {
+            flex-direction: column;
+            text-align: center;
+        }
+    }
+
+    .about-image {
+        flex: 1;
+        position: relative;
+    }
+
+    .about-image img {
+        width: 100%;
+        border-radius: 20px;
+        box-shadow: 0 30px 60px rgba(0,0,0,0.1);
+        border: 1px solid #fff;
+    }
+
+    .about-text {
+        flex: 1.2;
+    }
+
+    .about-text h2 {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.8rem;
+        color: #1a1a1a;
+        margin-bottom: 15px;
+    }
+
+    .about-text .year {
+        font-family: 'Outfit', sans-serif;
+        font-size: 2.2rem;
+        color: #2563eb;
+        margin-bottom: 25px;
+        font-weight: 300;
+    }
+
+    .about-text p {
+        color: #4a5568;
+        font-size: 1.1rem;
+        line-height: 1.8;
+        margin-bottom: 20px;
+    }
+
+    .btn-browse {
+        display: inline-block;
+        background-color: #1e293b;
+        color: white;
+        padding: 15px 35px;
+        border-radius: 40px;
+        text-decoration: none;
+        font-weight: 600;
+        margin-top: 20px;
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 25px rgba(30,41,59,0.2);
+    }
+
+    .btn-browse:hover {
+        background-color: #0f172a;
+        transform: translateY(-2px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="about-header">
+    <h1>About Us</h1>
+    <p>Discover the story behind Safar Management</p>
+</div>
+
+<div class="container about-content-wrapper">
+    <div class="about-split">
+        <div class="about-image">
+            <img src="{{ url_for('static', filename='images/auth_travel_side.png') }}" alt="Safar Journey">
+        </div>
+        <div class="about-text">
+            <h2>Our Travel Journey Since</h2>
+            <div class="year">2026</div>
+            <p>At <strong>Safar</strong>, we believe every journey tells a story. We're not just a travel agency; we are curators of moments and keepers of memories. Our team works tirelessly to bring the finest travel experiences directly to you.</p>
+            <p>Whether you're looking for a simple weekend getaway or a grand international adventure, we handle every detail with the utmost dedication to perfection. Our itineraries are inspired by form and seasonal movement, ensuring every trip is a unique masterpiece.</p>
+            <a href="{{ url_for('packages') }}" class="btn-browse">Browse Collection</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

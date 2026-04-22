@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Safar Admin – Travel Management System{% endblock %}</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --sidebar-bg: #ffffff;
+            --sidebar-width: 280px;
+            --sidebar-collapsed-width: 85px;
+            --primary-color: #a855f7;
+            --primary-gradient: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
+            --accent-color: #6366f1;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+            --bg-main: #f8fafc;
+            --transition-speed: 0.4s;
+            --shadow-premium: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --header-bg: #ffffff;
+            --border-color: #edf2f7;
+            --card-bg: #ffffff;
+            --brand-logo-color: #a855f7;
+            --brand-text-color: #1e293b;
+            --brand-subtext-color: #94a3b8;
+        }
+
+        [data-bs-theme="dark"] {
+            --sidebar-bg: #0f172a;
+            --primary-color: #c084fc;
+            --accent-color: #8b5cf6;
+            --text-dark: #f1f5f9;
+            --text-muted: #94a3b8;
+            --bg-main: #020617;
+            --header-bg: #0f172a;
+            --border-color: #1e293b;
+            --card-bg: #1e293b;
+            --brand-logo-color: #c084fc;
+            --brand-text-color: #ffffff;
+            --brand-subtext-color: #94a3b8;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-main);
+            margin: 0;
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Styles */
+        #sidebar {
+            width: var(--sidebar-width);
+            background: var(--sidebar-bg);
+            color: var(--text-dark);
+            transition: all var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 1100;
+            border-right: 1px solid var(--border-color);
+        }
+
+        #sidebar.collapsed {
+            width: var(--sidebar-collapsed-width);
+        }
+
+        .sidebar-header {
+            padding: 1.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid var(--border-color);
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .brand-logo {
+            min-width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--brand-logo-color);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .brand-logo svg {
+            width: 32px;
+            height: 32px;
+            animation: flyIn 1.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards, 
+                       hoverWave 3s ease-in-out 1.5s infinite alternate;
+        }
+
+        @keyframes flyIn {
+            0%   { transform: translate(-60px, 40px) rotate(-25deg) scale(0); opacity: 0; }
+            60%  { transform: translate(5px, -10px) rotate(15deg) scale(1.1); opacity: 1; }
+            80%  { transform: translate(-2px, 5px) rotate(-5deg) scale(0.95); }
+            100% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1; }
+        }
+
+        @keyframes hoverWave {
+            0%   { transform: translateY(0) rotate(0deg); }
+            33%  { transform: translateY(-5px) rotate(3deg); }
+            66%  { transform: translateY(3px) rotate(-2deg); }
+            100% { transform: translateY(0) rotate(0deg); }
+        }
+
+        #sidebar.collapsed .brand-logo {
+            transform: scale(0.9) translateX(5px);
+        }
+
+        .brand-logo svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.4));
+        }
+
+        .brand-name {
+            transition: opacity 0.3s, transform 0.3s;
+            color: var(--text-dark);
+        }
+
+        #sidebar.collapsed .brand-name {
+            opacity: 0;
+            transform: translateX(-20px);
+            pointer-events: none;
+        }
+
+        /* Sidebar Nav */
+        .sidebar-nav {
+            flex-grow: 1;
+            padding: 1.5rem 1rem;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .nav-section-label {
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 0 1rem;
+            margin-bottom: 1rem;
+            letter-spacing: 0.1em;
+            opacity: 0.6;
+            transition: opacity 0.3s;
+        }
+
+        #sidebar.collapsed .nav-section-label {
+            opacity: 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.85rem 1.1rem;
+            color: var(--text-muted);
+            text-decoration: none !important;
+            border-radius: 12px;
+            margin-bottom: 0.6rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            animation: slideInSidebar 0.5s ease backwards;
+            background: transparent !important;
+        }
+
+        @keyframes slideInSidebar {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .nav-item:hover {
+            background: #f1f5f9 !important;
+            color: var(--primary-color);
+            transform: translateX(8px);
+        }
+
+        .nav-item:active {
+            transform: scale(0.98) translateX(5px);
+        }
+
+        .nav-item:hover i {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .nav-item.active {
+            background: var(--primary-gradient) !important;
+            color: white !important;
+            font-weight: 700;
+            box-shadow: 0 4px 12px rgba(168, 85, 247, 0.25);
+            transform: scale(1.02);
+        }
+
+        .nav-item.active i {
+            color: white !important;
+        }
+
+        .nav-item.active::before {
+            display: none; /* Remove the old side-line indicator in favor of full background active state */
+        }
+
+        .nav-item i {
+            min-width: 24px;
+            margin-right: 15px;
+            font-size: 1.2rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #sidebar.collapsed .nav-item {
+            justify-content: center;
+            padding: 0.85rem 0;
+        }
+
+        #sidebar.collapsed .nav-item i {
+            margin-right: 0;
+        }
+
+        .nav-item span {
+            font-weight: 500;
+            white-space: nowrap;
+            transition: opacity 0.3s;
+        }
+
+        #sidebar.collapsed .nav-item span {
+            opacity: 0;
+            width: 0;
+            display: none;
+        }
+
+        /* Tooltip style for collapsed state */
+        .nav-item[data-tooltip]::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: 100%;
+            margin-left: 20px;
+            background: #1e293b;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: 0.2s;
+            white-space: nowrap;
+            pointer-events: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            z-index: 1200;
+        }
+
+        #sidebar.collapsed .nav-item:hover::after {
+            opacity: 1;
+            visibility: visible;
+            margin-left: 10px;
+        }
+
+        .sidebar-footer {
+            padding: 1.25rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Main Content Wrapper */
+        #main-wrapper {
+            flex-grow: 1;
+            margin-left: var(--sidebar-width);
+            transition: all var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            width: calc(100% - var(--sidebar-width));
+        }
+
+        #main-wrapper.expanded {
+            margin-left: var(--sidebar-collapsed-width);
+            width: calc(100% - var(--sidebar-collapsed-width));
+        }
+
+        header.top-bar {
+            background: var(--header-bg);
+            height: 80px;
+            padding: 0 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .content-area {
+            padding: 2.5rem;
+            flex-grow: 1;
+            animation: fadeInContent 0.6s ease-out;
+        }
+
+        @keyframes fadeInContent {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Toggler */
+        #sidebar-toggler {
+            background: rgba(168, 85, 247, 0.08);
+            border: 1px solid rgba(168, 85, 247, 0.15);
+            color: var(--primary-color);
+            cursor: pointer;
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #sidebar-toggler:hover {
+            background: var(--primary-gradient);
+            color: white;
+            transform: scale(1.1) rotate(180deg);
+            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+            border-color: transparent;
+        }
+
+        /* Cards and UI Elements */
+        .card-simple {
+            background: var(--card-bg) !important;
+            border-radius: 20px !important;
+            border: 1px solid var(--border-color) !important;
+            padding: 1.75rem !important;
+            box-shadow: var(--shadow-premium) !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .card-simple:hover {
+            transform: translateY(-5px) !important;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            #sidebar {
+                transform: translateX(-100%);
+            }
+            #sidebar.mobile-open {
+                transform: translateX(0);
+            }
+            #main-wrapper {
+                margin-left: 0 !important;
+                width: 100% !important;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.02);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0,0,0,0.2);
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <aside id="sidebar">
+        <div class="sidebar-header">
+            <div class="brand-logo">
+                <svg class="brand-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2 13 L30 2 L12 16 Z" fill="currentColor" stroke="#ffffff" stroke-width="1.2" stroke-linejoin="miter" />
+                    <path d="M12 16 L30 2 L23 30 Z" fill="currentColor" opacity="0.85" stroke="#ffffff" stroke-width="1.2" stroke-linejoin="miter" />
+                    <path d="M12 16 L19 23 L11 28 Z" fill="currentColor" opacity="0.65" stroke="#ffffff" stroke-width="1.2" stroke-linejoin="miter" />
+                </svg>
+            </div>
+            <div class="brand-name">
+                <div class="fw-bold" style="font-size: 1.6rem; line-height: 1; color: var(--brand-text-color); letter-spacing: -0.5px;">Safar</div>
+                <div class="text-muted" style="font-size: 0.5rem; text-transform: uppercase; letter-spacing: 0.8px; color: var(--brand-subtext-color); margin-top: 1px; font-weight: 600;">Travel Management System</div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section-label">Main Menu</div>
+            
+            <a href="{{ url_for('admin.dashboard') }}" class="nav-item {% if request.endpoint == 'admin.dashboard' %}active{% endif %}" data-tooltip="Dashboard" style="animation-delay: 0.15s;">
+                <i data-lucide="layout-dashboard"></i>
+                <span>Dashboard</span>
+            </a>
+            
+            <a href="{{ url_for('admin.manage_users') }}" class="nav-item {% if request.endpoint == 'admin.manage_users' %}active{% endif %}" data-tooltip="Travelers" style="animation-delay: 0.25s;">
+                <i data-lucide="users"></i>
+                <span>Travelers</span>
+            </a>
+            
+            <a href="{{ url_for('admin.manage_packages') }}" class="nav-item {% if request.endpoint == 'admin.manage_packages' %}active{% endif %}" data-tooltip="Packages" style="animation-delay: 0.35s;">
+                <i data-lucide="package"></i>
+                <span>Packages</span>
+            </a>
+            
+            <a href="{{ url_for('admin.manage_bookings') }}" class="nav-item {% if request.endpoint == 'admin.manage_bookings' %}active{% endif %}" data-tooltip="Bookings" style="animation-delay: 0.45s;">
+                <i data-lucide="ticket"></i>
+                <span>Bookings</span>
+            </a>
+            
+            <a href="{{ url_for('admin.manage_guides') }}" class="nav-item {% if request.endpoint == 'admin.manage_guides' %}active{% endif %}" data-tooltip="Guides" style="animation-delay: 0.55s;">
+                <i data-lucide="compass"></i>
+                <span>Guides</span>
+            </a>
+            
+            <a href="{{ url_for('admin.manage_feedback') }}" class="nav-item {% if request.endpoint == 'admin.manage_feedback' %}active{% endif %}" data-tooltip="Feedback" style="animation-delay: 0.65s;">
+                <i data-lucide="message-square"></i>
+                <span>Feedback</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="{{ url_for('auth.logout') }}" class="nav-item text-danger" data-tooltip="Logout">
+                <i data-lucide="log-out"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Wrapper -->
+    <div id="main-wrapper">
+        <header class="top-bar">
+            <div class="d-flex align-items-center gap-4">
+                <button id="sidebar-toggler" title="Expand/Collapse">
+                    <i data-lucide="chevron-left" id="toggler-icon"></i>
+                </button>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}" class="text-decoration-none text-primary fw-bold">Admin</a></li>
+                        <li class="breadcrumb-item active fw-bold text-dark" aria-current="page">{% block breadcrumb %}Dashboard{% endblock %}</li>
+                    </ol>
+                </nav>
+            </div>
+            
+            <div class="d-flex align-items-center gap-3">
+                <div class="text-end d-none d-sm-block me-2">
+                    <div class="fw-bold text-dark" style="line-height: 1.2;">Administrator</div>
+                    <div class="text-muted" style="font-size: 0.75rem;">Super Admin</div>
+                </div>
+                <div class="position-relative">
+                    <img src="https://ui-avatars.com/api/?name=Admin&background=2563eb&color=fff&bold=true" class="rounded-circle border border-2 border-white shadow-sm" style="width: 45px; height: 45px;" alt="Admin Avatar">
+                    <span class="position-absolute bottom-0 end-0 bg-success border border-2 border-white rounded-circle" style="width: 12px; height: 12px;"></span>
+                </div>
+                <button class="btn btn-sm btn-outline-secondary border-0 p-2 rounded-circle ms-1" type="button" data-bs-toggle="offcanvas" data-bs-target="#settingsPanel" aria-controls="settingsPanel" title="Settings">
+                    <i data-lucide="settings" size="20"></i>
+                </button>
+            </div>
+        </header>
+
+        <main class="content-area">
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div class="mb-4">
+                    {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show border-0 shadow-sm" style="border-radius: 12px; animation: slideInSidebar 0.5s ease-out;" role="alert">
+                        <div class="d-flex align-items-center gap-2">
+                            <i data-lucide="info" size="18"></i>
+                            <span>{{ message }}</span>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </main>
+
+        <!-- Footer Removed -->
+    </div>
+
+    <!-- Settings Offcanvas Panel -->
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="settingsPanel" aria-labelledby="settingsPanelLabel">
+        <div class="offcanvas-header border-bottom border-light-subtle">
+            <h5 class="offcanvas-title fw-bold d-flex align-items-center" id="settingsPanelLabel">
+                <i data-lucide="settings" size="20" class="me-2 text-primary"></i> Application Settings
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            
+            <!-- Language Options -->
+            <div class="mb-4">
+                <div class="d-flex align-items-center mb-2" style="cursor: pointer; user-select: none;" data-bs-toggle="collapse" data-bs-target="#languageCollapse" aria-expanded="false" aria-controls="languageCollapse">
+                    <i data-lucide="globe" size="18" class="me-2 text-dark fw-bold"></i>
+                    <h6 class="fw-bold mb-0 text-dark text-uppercase small" style="letter-spacing: 0.5px;">LANGUAGE PREFERENCES</h6>
+                </div>
+                
+                <div class="collapse show" id="languageCollapse">
+                    <div class="d-flex flex-column gap-2 mt-3 pt-1">
+                        <button class="btn btn-outline-primary lang-btn text-start d-flex justify-content-between align-items-center fw-bold" data-lang-code="en" style="border-radius: 6px;">
+                            <span>English (Default)</span>
+                        </button>
+                        <button class="btn btn-outline-primary lang-btn text-start d-flex justify-content-between align-items-center" data-lang-code="mr" style="border-radius: 6px;">
+                            <span>मराठी (Marathi)</span>
+                        </button>
+                        <button class="btn btn-outline-primary lang-btn text-start d-flex justify-content-between align-items-center" data-lang-code="hi" style="border-radius: 6px;">
+                            <span>हिंदी (Hindi)</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <hr class="border-light-subtle my-4">
+            
+            <!-- Theme Settings -->
+            <div class="mb-4">
+                <h6 class="fw-bold mb-3 text-muted text-uppercase small"><i data-lucide="monitor" size="14" class="me-1"></i> Theme Settings</h6>
+                <div class="form-check form-switch d-flex align-items-center gap-2 p-0">
+                    <label class="form-check-label flex-grow-1" for="themeSwitch">Dark Mode Preview</label>
+                    <input class="form-check-input m-0" type="checkbox" role="switch" id="themeSwitch">
+                </div>
+            </div>
+            
+            <div class="sidebar-footer p-0 border-0 mt-5">
+                <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center gap-2" style="border-radius: 12px; height: 50px;">
+                    <i data-lucide="log-out" size="18"></i>
+                    <span class="fw-bold">Logout System</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Sidebar Toggle Logic
+        const sidebar = document.getElementById('sidebar');
+        const wrapper = document.getElementById('main-wrapper');
+        const toggler = document.getElementById('sidebar-toggler');
+        const togglerIcon = document.getElementById('toggler-icon');
+
+        toggler.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            wrapper.classList.toggle('expanded');
+            
+            // Toggle icon
+            if (sidebar.classList.contains('collapsed')) {
+                togglerIcon.setAttribute('data-lucide', 'chevron-right');
+            } else {
+                togglerIcon.setAttribute('data-lucide', 'chevron-left');
+            }
+            lucide.createIcons();
+            
+            // Handle mobile
+            if (window.innerWidth <= 992) {
+                sidebar.classList.toggle('mobile-open');
+            }
+        });
+
+        // Initialize tooltips for sidebar
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => {
+            item.addEventListener('mouseenter', () => {
+                if (sidebar.classList.contains('collapsed')) {
+                    // Custom tooltip logic if needed, but CSS handles it
+                }
+            });
+        });
+
+        // Smooth active link transition
+        document.querySelectorAll('.nav-item').forEach(item => {
+            if (item.classList.contains('active')) {
+                item.style.transform = 'translateX(5px)';
+            }
+        });
+
+        // Auto-dismiss alerts after 5 seconds
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+    </script>
+    
+    <!-- Internal Multi-language & Theme Script -->
+    <script src="/static/js/translations.js"></script>
+    
+    {% block extra_js %}{% endblock %}
+
+    <!-- Theme & Persistence Script -->
+    <script>
+        const themeSwitch = document.getElementById('themeSwitch');
+        const htmlElement = document.documentElement;
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        htmlElement.setAttribute('data-bs-theme', savedTheme);
+        if (themeSwitch) themeSwitch.checked = savedTheme === 'dark';
+
+        // Toggle theme
+        if (themeSwitch) {
+            themeSwitch.addEventListener('change', function() {
+                const newTheme = this.checked ? 'dark' : 'light';
+                htmlElement.setAttribute('data-bs-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+            });
+        }
+    </script>
+</body>
+
+</html>

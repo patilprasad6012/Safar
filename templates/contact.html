@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact Us - Safar{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+    body {
+        background-color: var(--bg-color);
+        font-family: 'Outfit', sans-serif;
+    }
+
+    .contact-header {
+        text-align: center;
+        padding: 80px 20px;
+        background: transparent;
+        margin-bottom: 30px;
+    }
+
+    .contact-header h1 {
+        font-family: 'Playfair Display', serif;
+        font-size: 3.5rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 15px;
+    }
+
+    .contact-header p {
+        color: var(--text-muted);
+        font-size: 1.1rem;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .contact-container {
+        max-width: 850px;
+        margin: 0 auto 100px;
+        background: var(--card-bg);
+        padding: 60px;
+        border-radius: 24px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 20px 60px rgba(0,0,0,0.04);
+    }
+
+    .form-label {
+        color: var(--text-dark);
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 10px;
+    }
+
+    .form-control {
+        border-radius: 12px;
+        padding: 14px 18px;
+        border: 1px solid var(--border-color);
+        background-color: #f8fafc;
+        margin-bottom: 25px;
+        font-size: 0.95rem;
+        transition: all 0.2s;
+    }
+    
+    [data-bs-theme="dark"] .form-control {
+        background-color: #020617;
+        color: white;
+    }
+
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.1);
+        background-color: #ffffff;
+    }
+
+    .btn-send {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 16px;
+        border-radius: 12px;
+        border: none;
+        font-weight: 700;
+        font-size: 1rem;
+        width: 100%;
+        margin-top: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+    }
+
+    .btn-send:hover {
+        opacity: 0.95;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(168, 85, 247, 0.4);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="contact-header">
+    <h1>Get in Touch</h1>
+    <p>We'd love to hear from you and start your journey together.</p>
+</div>
+
+<div class="contact-container">
+    {% if request.args.get('success') %}
+    <div class="text-center py-5">
+        <div class="bg-success-subtle text-success rounded-circle mx-auto mb-4 d-flex align-items-center justify-content-center" style="width: 100px; height: 100px;">
+            <i data-lucide="check-circle" size="48"></i>
+        </div>
+        <h2 class="fw-bold text-dark">Message Sent!</h2>
+        <p class="text-muted mb-5">Thank you for reaching out. We have received your inquiry and will get back to you within 24 hours.</p>
+        <a href="{{ url_for('contact') }}" class="btn btn-primary-custom" style="max-width: 250px;">Send Another Message</a>
+    </div>
+    {% else %}
+    <form action="{{ url_for('contact') }}" method="POST">
+        <div class="row">
+            <div class="col-md-6">
+                <label class="form-label">First Name</label>
+                <input type="text" name="first_name" class="form-control" placeholder="John" required>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Last Name</label>
+                <input type="text" name="last_name" class="form-control" placeholder="Doe" required>
+            </div>
+        </div>
+
+        <label class="form-label">Email Address</label>
+        <input type="email" name="email" class="form-control" placeholder="john@example.com" required>
+
+        <label class="form-label">Subject</label>
+        <input type="text" name="subject" class="form-control" placeholder="How can we help?" required>
+
+        <label class="form-label">Message</label>
+        <textarea name="message" class="form-control" rows="5" placeholder="Tell us about your dream destination..." required></textarea>
+
+        <button type="submit" class="btn-send">Send Message</button>
+    </form>
+    {% endif %}
+</div>
+{% endblock %}

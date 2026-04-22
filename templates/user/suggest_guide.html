@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Select a Guide - Safar{% endblock %}
+
+{% block content %}
+<div class="row pt-5">
+    <div class="col-12 text-center mb-4">
+        <i data-lucide="map" class="text-primary mb-3" size="48"></i>
+        <h2 class="fw-bold text-primary">Enhance your trip with a Local Expert!</h2>
+        <p class="text-muted fs-5">Would you like to hire a verified local guide for your trip to <span class="fw-bold">{{ package.destination }}</span>?</p>
+    </div>
+</div>
+
+<div class="row pb-5">
+    <div class="col-lg-10 mx-auto">
+        <form action="{{ url_for('user.payment', id=package.id) }}" method="POST">
+            <input type="hidden" name="special_requests" value="{{ special_requests }}">
+            
+            {% if guides %}
+                <div class="row g-4 mb-4">
+                    {% for g in guides %}
+                    <div class="col-md-6">
+                        <div class="card-simple h-100 border hover-shadow transition">
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold fs-4" style="width: 50px; height: 50px;">
+                                    {{ g.full_name[0] | upper }}
+                                </div>
+                                <div>
+                                    <h5 class="fw-bold mb-0">{{ g.full_name }}</h5>
+                                    <span class="badge bg-light text-dark border small mt-1"><i data-lucide="award" size="12" class="me-1"></i>{{ g.experience }}</span>
+                                </div>
+                            </div>
+                            
+                            <p class="small text-muted mb-4" style="min-height: 48px; line-height: 1.5;">"{{ g.bio[:120] }}..."</p>
+                            
+                            <div class="d-flex justify-content-between align-items-center border-top pt-3 mt-auto">
+                                <div>
+                                    <div class="small text-muted">Guide Fee</div>
+                                    <div class="fw-bold text-success fs-5">₹{{ g.daily_rate }} <span class="fs-6 text-muted fw-normal">/ day</span></div>
+                                </div>
+                                <button type="submit" name="guide_id" value="{{ g.id }}" class="btn btn-primary px-4">Yes, Add Guide</button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info text-center py-4 rounded-4 border-0 bg-light">
+                    <i data-lucide="info" class="mb-2 text-muted"></i><br>
+                    <span class="text-muted">No specialized guides are available for this location at the moment.</span>
+                </div>
+            {% endif %}
+
+            <div class="text-center mt-5">
+                <hr class="w-50 mx-auto mb-4 border-secondary opacity-25">
+                <button type="submit" name="guide_id" value="" class="btn btn-outline-secondary px-5 py-3 fw-bold rounded-pill">No Thanks, Continue to Payment &rarr;</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

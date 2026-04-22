@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}Guide Profile - {{ guide.full_name }}{% endblock %}
+
+{% block content %}
+<div class="row pt-4 justify-content-center">
+    <div class="col-md-5 mb-4">
+        <!-- Guide Details Card -->
+        <div class="card-simple text-center border-success position-relative">
+            <div class="mb-3 d-flex justify-content-center">
+                <div style="width: 100px; height: 100px; border-radius: 50%; background-color: #e5e7eb; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: bold; color: #10b981;">
+                    {{ guide.full_name[0] }}
+                </div>
+            </div>
+            
+            <h2 class="fw-bold mb-1">{{ guide.full_name }}</h2>
+            <div class="badge bg-success mb-3 px-3 py-2">
+                {% if guide.is_approved %}
+                    <i data-lucide="check-circle" size="14" class="me-1"></i> Verified Safar Guide
+                {% else %}
+                    <i data-lucide="info" size="14" class="me-1"></i> Independent Guide
+                {% endif %}
+            </div>
+            
+            <p class="text-muted fst-italic mb-4 px-3" style="line-height: 1.6;">
+                "{{ guide.bio }}"
+            </p>
+            
+            <hr class="w-50 mx-auto my-4 text-muted">
+            
+            <h6 class="text-start fw-bold mb-3"><i data-lucide="map" size="18" class="text-success me-2"></i> Destinations & Experience:</h6>
+            <div class="bg-light p-3 rounded text-start text-muted mb-4" style="white-space: pre-wrap;">{{ guide.experience }}</div>
+        </div>
+    </div>
+    
+    <div class="col-md-5">
+        <!-- Leave Feedback Form -->
+        <div class="card-simple">
+            <h4 class="fw-bold mb-4">Leave Feedback</h4>
+            
+            <form action="{{ url_for('guide.submit_feedback', guide_id=guide.id) }}" method="POST">
+                {% if not session.get('user_id') %}
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Your Name</label>
+                    <input type="text" name="user_name" class="form-control" placeholder="John Doe" required>
+                </div>
+                {% endif %}
+                
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Rating (Out of 5)</label>
+                    <select name="rating" class="form-select" required>
+                        <option value="5" selected>★★★★★ - Excellent!</option>
+                        <option value="4">★★★★☆ - Very Good</option>
+                        <option value="3">★★★☆☆ - Average</option>
+                        <option value="2">★★☆☆☆ - Below Average</option>
+                        <option value="1">★☆☆☆☆ - Poor</option>
+                    </select>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="form-label small fw-bold">Your Experience</label>
+                    <textarea name="feedback_text" class="form-control" rows="4" placeholder="How was the tour? Share your thoughts!" required></textarea>
+                </div>
+                
+                <button type="submit" class="btn btn-success w-100 fw-bold py-2">Submit Feedback</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    lucide.createIcons();
+</script>
+{% endblock %}

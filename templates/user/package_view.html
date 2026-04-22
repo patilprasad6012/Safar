@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block title %}Package Details - Smart Travel{% endblock %}
+
+{% block content %}
+<div class="row pt-4">
+    <div class="col-md-8">
+        <div class="card-simple mb-4">
+            <h2 class="fw-bold mb-2">{{ package.title }}</h2>
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <span class="badge bg-light text-dark border small">{{ package.destination }}</span>
+                <span class="text-muted small">ID: PKG-{{ package.id }}</span>
+            </div>
+            
+            <div style="border-radius: 12px; overflow: hidden; margin-bottom: 2rem; border: 1px solid var(--border-color);">
+                <img src="{{ package.image_url }}" alt="Package" style="width: 100%; height: 400px; object-fit: cover;">
+            </div>
+            
+            <h4 class="fw-bold mb-3">About the Trip</h4>
+            <p class="text-muted mb-5" style="line-height: 1.6; white-space: pre-line;">{{ package.description }}</p>
+            
+            <h5 class="fw-bold mb-3">Highlights</h5>
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <div class="p-3 bg-light rounded border text-center">
+                        <div class="small text-muted">Duration</div>
+                        <div class="fw-bold">{{ package.duration }}</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-3 bg-light rounded border text-center">
+                        <div class="small text-muted">Total Slots</div>
+                        <div class="fw-bold">{{ package.total_slots }}</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-3 bg-light rounded border text-center">
+                        <div class="small text-muted">Available</div>
+                        <div class="fw-bold">{{ package.available_slots }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="sticky-top" style="top: 100px;">
+            <!-- Countdown Card -->
+            <div class="card-simple mb-4 border-warning">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <i data-lucide="alarm-clock" class="text-warning"></i>
+                    <h6 class="fw-bold m-0">Booking Closes In:</h6>
+                </div>
+                <div id="countdown" class="d-flex justify-content-between text-center gap-1 mb-2">
+                    <div class="bg-light p-2 rounded border flex-grow-1">
+                        <div id="days" class="h5 fw-bold m-0">00</div>
+                        <div class="small text-muted" style="font-size: 0.7rem;">Days</div>
+                    </div>
+                    <div class="bg-light p-2 rounded border flex-grow-1">
+                        <div id="hours" class="h5 fw-bold m-0">00</div>
+                        <div class="small text-muted" style="font-size: 0.7rem;">Hrs</div>
+                    </div>
+                    <div class="bg-light p-2 rounded border flex-grow-1">
+                        <div id="mins" class="h5 fw-bold m-0">00</div>
+                        <div class="small text-muted" style="font-size: 0.7rem;">Mins</div>
+                    </div>
+                    <div class="bg-light p-2 rounded border flex-grow-1">
+                        <div id="secs" class="h5 fw-bold m-0">00</div>
+                        <div class="small text-muted" style="font-size: 0.7rem;">Secs</div>
+                    </div>
+                </div>
+                <div class="small text-center text-muted">
+                    Until {{ package.booking_end_date.strftime('%b %d, %Y') }}
+                </div>
+            </div>
+            
+            <!-- Booking Card -->
+            <div class="card-simple">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="text-muted small">Per Traveler</span>
+                    <h3 class="fw-bold m-0 text-primary">₹{{ package.price }}</h3>
+                </div>
+                
+                <hr class="my-4">
+                
+                {% if is_available %}
+                    <form action="{{ url_for('user.suggest_guide', id=package.id) }}" method="POST">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Special Requests</label>
+                            <textarea name="special_requests" class="form-control" rows="2" placeholder="Dietary needs etc."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 py-2 fw-bold mb-3">Book Now</button>
+                    </form>
+                {% else %}
+                    <button class="btn btn-secondary w-100 py-2 fw-bold disabled mb-2">Unavailable</button>
+                {% endif %}
+                
+                <a href="{{ url_for('user.dashboard') }}" class="btn btn-link text-muted w-100 text-decoration-none small text-center">
+                    &larr; Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Booking countdown logic
+    const deadline = new Date("{{ package.booking_end_date.strftime('%Y-%m-%dT%H:%M:%S') }}").getTime();
+    
+    function updateCountdown() {
+        const now = new Date().getTime();
+        const distance = deadline - now;
+        
+        if (distance < 0) {
+            document.getElementById("countdown").innerHTML = "<div class='text-danger fw-bold py-2 w-100'>BOOKING EXPIRED</div>";
+            return;
+        }
+        
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const mins = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const secs = Math.floor((distance % (1000 * 60)) / 1000);
+        
+        document.getElementById("days").innerText = days.toString().padStart(2, '0');
+        document.getElementById("hours").innerText = hours.toString().padStart(2, '0');
+        document.getElementById("mins").innerText = mins.toString().padStart(2, '0');
+        document.getElementById("secs").innerText = secs.toString().padStart(2, '0');
+    }
+    
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+</script>
+{% endblock %}

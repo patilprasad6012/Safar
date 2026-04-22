@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Discover Packages - Safar{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h2 class="fw-bold m-0" data-translate="Discover Packages">Discover Packages</h2>
+    <p class="text-muted small" data-translate="Explore our handpicked travel experiences from around the world.">Explore our handpicked travel experiences from around the world.</p>
+</div>
+
+<!-- Filter Controls -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h5 class="fw-bold m-0 text-muted">
+        {% if request.args.get('search') %}
+            <span data-translate="Results for">Results for</span> "{{ request.args.get('search') }}" ({{ packages|length }})
+        {% else %}
+            <span data-translate="Available Packages">Available Packages</span>
+        {% endif %}
+    </h5>
+    <form action="{{ url_for('packages') }}" method="GET" class="d-flex align-items-center bg-white border rounded ps-3 pe-1 py-1 shadow-sm">
+        {% if request.args.get('search') %}
+        <input type="hidden" name="search" value="{{ request.args.get('search') }}">
+        {% endif %}
+        <label class="small text-muted me-2 fw-bold text-nowrap"><i data-lucide="filter" size="14" class="me-1"></i><span data-translate="Sort by:">Sort by:</span></label>
+        <select name="sort" class="form-select form-select-sm border-0 shadow-none fw-bold" onchange="this.form.submit()" style="cursor: pointer; background-color: transparent; color: #a855f7;">
+            <option value="recent" {% if request.args.get('sort') == 'recent' %}selected{% endif %} data-translate="Recently Added">Recently Added</option>
+            <option value="price_low" {% if request.args.get('sort') == 'price_low' %}selected{% endif %} data-translate="Price: Low to High">Price: Low to High</option>
+            <option value="price_high" {% if request.args.get('sort') == 'price_high' %}selected{% endif %} data-translate="Price: High to Low">Price: High to Low</option>
+        </select>
+    </form>
+</div>
+
+<div class="row g-4">
+    {% if packages %}
+        {% for p in packages %}
+        <div class="col-md-4">
+            <div class="card-simple h-100 p-0 overflow-hidden">
+                <div style="height: 180px; overflow: hidden; position: relative;">
+                    <img src="{{ p.image_url }}" alt="Package" style="width: 100%; height: 100%; object-fit: cover;">
+                    <div class="position-absolute top-0 end-0 p-2">
+                        <span class="badge shadow-sm" style="background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%); color: white;">₹{{ p.price }}</span>
+                    </div>
+                </div>
+                <div class="p-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="badge bg-light text-dark border small" data-translate="{{ p.destination }}">{{ p.destination }}</span>
+                        <span class="text-muted small"><i data-lucide="clock" size="14"></i> {{ p.duration }}</span>
+                    </div>
+                    <h6 class="fw-bold mb-2" data-translate="{{ p.title }}">{{ p.title }}</h6>
+                    <p class="text-muted small mb-3">{{ p.available_slots }} <span data-translate="slots remaining!">slots remaining!</span></p>
+                    {% if session.get('user_id') %}
+                        <a href="{{ url_for('user.package_details', id=p.id) }}" class="btn btn-primary-custom btn-sm w-100" data-translate="Details & Book">Details & Book</a>
+                    {% else %}
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-primary-custom btn-sm w-100" data-translate="Login to Book">Login to Book</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12 py-5 text-center text-muted">
+            <i data-lucide="search-x" class="mb-3 d-block mx-auto" size="48" style="opacity: 0.2;"></i>
+            <span data-translate="No packages available at the moment.">No packages available at the moment.</span>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

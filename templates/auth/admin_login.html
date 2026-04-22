@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Access - Smart Travel{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center pt-5">
+    <div class="col-md-4">
+        <div class="card-simple">
+            <h2 class="fw-bold mb-3 text-center">Admin Login</h2>
+            <p class="text-muted text-center mb-4">Enter admin credentials to continue.</p>
+            
+            <form action="{{ url_for('auth.admin_login') }}" method="POST">
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Admin Username</label>
+                    <input type="text" name="username" class="form-control" placeholder="Admin ID" required>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label small fw-bold">Master Password</label>
+                    <input type="password" name="password" class="form-control" placeholder="Admin Token" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary w-100 py-2 mb-3 fw-bold">Login as Admin</button>
+            </form>
+            
+            <div class="text-center">
+                <a href="{{ url_for('index') }}" class="text-decoration-none small text-muted">&larr; Back to Home</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,415 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}Admin Dashboard - Safar{% endblock %}
+
+{% block breadcrumb %}Dashboard Overview{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold m-0 text-primary">Admin Dashboard</h2>
+        <p class="text-muted small">Manage accounts, track revenue, and generate reports.</p>
+    </div>
+</div>
+
+<!-- Stats Row -->
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card-simple border-0 shadow-sm" style="background: #fdf2ff; border-radius: 16px;">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div class="p-2 bg-white rounded-3 shadow-sm" style="color: #a855f7;">
+                    <i data-lucide="users" size="24"></i>
+                </div>
+                <span class="text-muted small fw-bold text-uppercase" style="letter-spacing: 0.5px;">Travelers</span>
+            </div>
+            <h2 class="fw-bold mb-0" style="color: #1e293b; font-size: 2.2rem;">{{ total_users }}</h2>
+            <div class="mt-2 small text-muted">Active accounts</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card-simple border-0 shadow-sm" style="background: #ecfdf5; border-radius: 16px;">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div class="p-2 bg-white rounded-3 shadow-sm" style="color: #10b981;">
+                    <i data-lucide="map" size="24"></i>
+                </div>
+                <span class="text-muted small fw-bold text-uppercase" style="letter-spacing: 0.5px;">Packages</span>
+            </div>
+            <h2 class="fw-bold mb-0" style="color: #1e293b; font-size: 2.2rem;">{{ total_packages }}</h2>
+            <div class="mt-2 small text-muted">Destinations live</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card-simple border-0 shadow-sm" style="background: #fffbeb; border-radius: 16px;">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div class="p-2 bg-white rounded-3 shadow-sm" style="color: #f59e0b;">
+                    <i data-lucide="ticket" size="24"></i>
+                </div>
+                <span class="text-muted small fw-bold text-uppercase" style="letter-spacing: 0.5px;">Bookings</span>
+            </div>
+            <h2 class="fw-bold mb-0" style="color: #1e293b; font-size: 2.2rem;">{{ total_bookings }}</h2>
+            <div class="mt-2 small text-muted">Processed total</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card-simple border-0 shadow-sm" style="background: #f0f7ff; border-radius: 16px;">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div class="p-2 bg-white rounded-3 shadow-sm" style="color: #3b82f6;">
+                    <i data-lucide="indian-rupee" size="24"></i>
+                </div>
+                <span class="text-muted small fw-bold text-uppercase" style="letter-spacing: 0.5px;">Revenue</span>
+            </div>
+            <h2 class="fw-bold mb-0" style="color: #1e293b; font-size: 2.2rem;">₹{{ "{:,.0f}".format(total_revenue) }}</h2>
+            <div class="mt-2 small text-muted">Confirmed sales</div>
+        </div>
+    </div>
+</div>
+
+<!-- Monthly Sales Chart & Profit/Loss Analysis -->
+<div class="row g-4 mb-4">
+    <div class="col-md-8">
+        <div class="card-simple h-100">
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                <h5 class="fw-bold m-0 d-flex align-items-center"><i data-lucide="bar-chart-3" size="20"
+                        class="me-2 text-primary"></i> <span id="chartTitle">{% if from_date and to_date %}Sales ({{
+                        from_date }} to {{ to_date }}){% else %}Recent Sales (Last 12 Months){% endif %}</span></h5>
+                <form method="GET" action="{{ url_for('admin.dashboard') }}"
+                    class="m-0 d-flex gap-2 align-items-center">
+                    <span class="small text-muted fw-bold">From:</span>
+                    <input type="date" name="from_date" class="form-control form-control-sm border-primary"
+                        value="{{ from_date }}" required>
+                    <span class="small text-muted fw-bold">To:</span>
+                    <input type="date" name="to_date" class="form-control form-control-sm border-primary"
+                        value="{{ to_date }}" required>
+                    <button type="submit" class="btn btn-sm btn-primary fw-bold px-3">Filter</button>
+                    {% if from_date and to_date %}
+                    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-sm btn-outline-secondary">Clear</a>
+                    {% endif %}
+                </form>
+            </div>
+            <canvas id="monthlySalesChart" style="max-height: 300px;"></canvas>
+
+            <!-- Extra features utilizing empty space -->
+            <div class="mt-5 border-top pt-4">
+                <h6 class="fw-bold mb-3 text-muted text-uppercase small"><i data-lucide="star" size="14"
+                        class="me-1 text-warning"></i> Top Packages in Selected Period</h6>
+                <div class="row g-3">
+                    {% for tp in top_packages_period %}
+                    <div class="col-md-4">
+                        <div
+                            class="p-3 bg-light rounded border position-relative overflow-hidden h-100 transition-all hover-shadow">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="fw-bold text-dark text-truncate d-block" style="max-width: 80%;"
+                                    title="{{ tp.title }}">{{ tp.title }}</span>
+                                <span class="badge bg-primary rounded-pill">{{ loop.index }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between text-muted small mt-3">
+                                <span class="d-flex align-items-center gap-1"><i data-lucide="ticket" size="14"></i> {{
+                                    tp.bookings }}</span>
+                                <span class="fw-bold text-success">₹{{ "{:,.0f}".format(tp.revenue) }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="col-12 text-muted small text-center py-3 bg-light rounded border border-dashed">No sales
+                        data for this period.</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card-simple h-100">
+            <h5 class="fw-bold mb-4"><i data-lucide="pie-chart" size="20" class="me-1 text-primary"></i> Profit & Loss
+            </h5>
+
+            <div class="d-flex flex-column gap-3">
+                <!-- Revenue -->
+                <div class="p-3 bg-success bg-opacity-10 rounded border border-success border-opacity-25">
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <i data-lucide="trending-up" size="18" class="text-success"></i>
+                        <span class="small fw-bold text-success">CONFIRMED REVENUE</span>
+                    </div>
+                    <h4 class="fw-bold text-success mb-0">₹{{ "{:,.2f}".format(total_revenue) }}</h4>
+                </div>
+
+                <!-- Lost Revenue -->
+                <div class="p-3 bg-danger bg-opacity-10 rounded border border-danger border-opacity-25">
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <i data-lucide="trending-down" size="18" class="text-danger"></i>
+                        <span class="small fw-bold text-danger">CANCELLED / LOST</span>
+                    </div>
+                    <h4 class="fw-bold text-danger mb-0">- ₹{{ "{:,.2f}".format(lost_revenue) }}</h4>
+                </div>
+
+                <!-- Pending Revenue -->
+                <div class="p-3 bg-warning bg-opacity-10 rounded border border-warning border-opacity-25">
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <i data-lucide="clock" size="18" class="text-warning"></i>
+                        <span class="small fw-bold text-warning">PENDING</span>
+                    </div>
+                    <h4 class="fw-bold text-warning mb-0">₹{{ "{:,.2f}".format(pending_revenue) }}</h4>
+                </div>
+
+                <!-- Net Profit -->
+                <hr class="my-1">
+                <div class="p-3 bg-primary bg-opacity-10 rounded border border-primary border-opacity-25" style="border-color: rgba(168, 85, 247, 0.4) !important;">
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <i data-lucide="wallet" size="18" class="text-primary"></i>
+                        <span class="small fw-bold text-primary">NET PROFIT</span>
+                    </div>
+                    <h4 class="fw-bold text-primary mb-0">₹{{ "{:,.2f}".format(total_revenue - lost_revenue) }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Booking Analytics & System Status -->
+<div class="row g-4 mb-4">
+    <div class="col-md-5">
+        <div class="card-simple h-100">
+            <h5 class="fw-bold mb-4"><i data-lucide="activity" size="20" class="me-1 text-primary"></i> Booking
+                Analytics</h5>
+            <canvas id="bookingChart" style="max-height: 260px;"></canvas>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card-simple h-100">
+            <h5 class="fw-bold mb-4"><i data-lucide="server" size="20" class="me-1 text-primary"></i> System Status</h5>
+            <div class="d-flex flex-column gap-3">
+                <div class="p-3 bg-light rounded border">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="small fw-semibold">Database</span>
+                        <span class="badge bg-success">Online</span>
+                    </div>
+                </div>
+                <div class="p-3 bg-light rounded border">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="small fw-semibold">Slots</span>
+                        <span class="text-muted small">{{ system_available_slots }} / {{ system_total_slots }}</span>
+                    </div>
+                </div>
+                <div class="p-3 bg-light rounded border">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="small fw-semibold">Active Guides</span>
+                        <span class="badge bg-info">{{ active_guides }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card-simple h-100">
+            <h5 class="fw-bold mb-4"><i data-lucide="file-text" size="20" class="me-1 text-primary"></i> Monthly Report
+            </h5>
+            <p class="text-muted small">Generate a summary of this month's performance including revenue, bookings,
+                cancellations, and guide statistics.</p>
+
+            <div class="d-grid gap-2">
+                <a href="{{ url_for('admin.monthly_report') }}" class="btn btn-primary fw-bold"><i
+                        data-lucide="download" size="16" class="me-1"></i> Generate Report</a>
+                <a href="{{ url_for('admin.add_package') }}" class="btn btn-outline-secondary btn-sm">Add New
+                    Package</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Pending Guide Applications Section -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card-simple">
+            <h5 class="fw-bold mb-4 d-flex align-items-center"><i data-lucide="user-plus" size="20"
+                    class="me-2 text-primary"></i> Pending Guide Applications</h5>
+
+            {% if pending_guides %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light small">
+                        <tr>
+                            <th class="ps-4">Candidate</th>
+                            <th>Applied On</th>
+                            <th class="text-end pe-4">Quick Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pg in pending_guides %}
+                        <tr>
+                            <td class="ps-4">
+                                <div class="fw-bold text-dark">{{ pg.full_name }}</div>
+                                <div class="small text-muted">{{ pg.email }}</div>
+                            </td>
+                            <td>{{ pg.created_at.strftime('%b %d, %Y') }}</td>
+                            <td class="text-end pe-4">
+                                <a href="{{ url_for('admin.approve_guide', id=pg.id) }}"
+                                    class="btn btn-sm btn-success me-1 px-3 fw-bold"
+                                    onclick="return confirm('Approve {{ pg.full_name }}\'s application?')">Accept</a>
+                                <a href="{{ url_for('admin.reject_guide', id=pg.id) }}"
+                                    class="btn btn-sm btn-outline-danger me-2"
+                                    onclick="return confirm('Reject {{ pg.full_name }}\'s application?')">Reject</a>
+                                <a href="{{ url_for('admin.manage_guides') }}"
+                                    class="btn btn-sm btn-link text-decoration-none">Review full profile</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-4 text-muted border border-dashed rounded bg-light">
+                <i data-lucide="check-circle" class="mb-2 d-block mx-auto text-success" size="32"
+                    style="opacity: 0.5;"></i>
+                No pending applications. You're all caught up!
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Monthly Sales Table -->
+{% if monthly_sales %}
+<div class="card-simple mb-5">
+    <h5 class="fw-bold mb-4"><i data-lucide="table" size="20" class="me-1 text-primary"></i> Monthly Sales Summary</h5>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="bg-light small">
+                <tr>
+                    <th class="ps-4">Period</th>
+                    <th>Total Bookings</th>
+                    <th>Revenue</th>
+                    <th class="text-end pe-4">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for m in monthly_sales %}
+                <tr>
+                    <td class="ps-4 fw-bold">{{ m.label }}</td>
+                    <td>{{ m.total_bookings }} bookings</td>
+                    <td class="fw-bold text-success">₹{{ "{:,.2f}".format(m.revenue) }}</td>
+                    <td class="text-end pe-4">
+                        {% if m.revenue > 0 %}
+                        <span
+                            class="badge bg-success-subtle text-success border border-success-subtle px-2">Profit</span>
+                        {% else %}
+                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2">No
+                            Sales</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+<!-- Hidden data for Chart.js -->
+<script id="stats-data" type="application/json">{{ booking_stats|tojson|safe }}</script>
+<script id="monthly-data" type="application/json">{{ monthly_sales|tojson|safe }}</script>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // === Booking Analytics (Bar Chart) ===
+    const ctx = document.getElementById('bookingChart').getContext('2d');
+    const statsElem = document.getElementById('stats-data');
+    const bookingStats = statsElem ? JSON.parse(statsElem.textContent) : [];
+
+    const labels = bookingStats.map(stat => stat.status.charAt(0).toUpperCase() + stat.status.slice(1));
+    const data = bookingStats.map(stat => stat.count);
+    const bgColors = labels.map(l => l === 'Confirmed' ? '#10b981' : l === 'Cancelled' ? '#ef4444' : '#f59e0b');
+
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                backgroundColor: bgColors,
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom', labels: { padding: 16, font: { size: 12, weight: 'bold' } } }
+            }
+        }
+    });
+
+    // === Monthly Sales (Line Chart) ===
+    const monthlyElem = document.getElementById('monthly-data');
+    const monthlySales = monthlyElem ? JSON.parse(monthlyElem.textContent) : [];
+
+    const monthLabels = monthlySales.map(m => m.label);
+    const revenueData = monthlySales.map(m => parseFloat(m.revenue));
+    const bookingData = monthlySales.map(m => m.total_bookings);
+
+    const ctx2 = document.getElementById('monthlySalesChart').getContext('2d');
+    new Chart(ctx2, {
+        type: 'line',
+        data: {
+            labels: monthLabels,
+            datasets: [
+                {
+                    label: 'Revenue (₹)',
+                    data: revenueData,
+                    borderColor: '#a855f7',
+                    backgroundColor: 'rgba(168, 85, 247, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    borderWidth: 3,
+                    pointBackgroundColor: '#a855f7',
+                    pointRadius: 5,
+                    yAxisID: 'y'
+                },
+                {
+                    label: 'Bookings',
+                    data: bookingData,
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    borderWidth: 2,
+                    pointBackgroundColor: '#10b981',
+                    pointRadius: 4,
+                    yAxisID: 'y1'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            scales: {
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    beginAtZero: true,
+                    grid: { color: '#f1f5f9' },
+                    ticks: { color: '#64748b', callback: v => '₹' + v.toLocaleString() }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    beginAtZero: true,
+                    grid: { drawOnChartArea: false },
+                    ticks: { color: '#10b981' }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#64748b' }
+                }
+            },
+            plugins: {
+                legend: { position: 'top', labels: { padding: 16, font: { size: 12, weight: 'bold' } } }
+            }
+        }
+    });
+</script>
+{% endblock %}

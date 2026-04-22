@@ -1,0 +1,84 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}Manage Packages - Admin Console{% endblock %}
+
+{% block breadcrumb %}Packages Management{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold m-0 text-primary">Travel Packages</h2>
+        <p class="text-muted small">Manage your current travel deals.</p>
+    </div>
+    <a href="{{ url_for('admin.add_package') }}" class="btn btn-primary btn-sm rounded-pill px-3">Add New Package</a>
+</div>
+
+<div class="card-simple p-0">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="bg-light small">
+                <tr>
+                    <th class="ps-4">Package</th>
+                    <th>Destination</th>
+                    <th>Price</th>
+                    <th>Availability</th>
+                    <th>Status</th>
+                    <th class="text-end pe-4">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if packages %}
+                {% for p in packages %}
+                <tr>
+                    <td class="ps-4">
+                        <div class="d-flex align-items-center gap-2">
+                            <img src="{{ p.image_url }}" alt="Package"
+                                style="width: 40px; height: 40px; border-radius: 4px; object-fit: cover; border: 1px solid #e2e8f0;">
+                            <div>
+                                <div class="fw-bold small">{{ p.title }}</div>
+                                <div class="text-muted" style="font-size: 0.75rem;">{{ p.duration }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="badge bg-light text-dark border small">{{ p.destination }}</span></td>
+                    <td class="fw-bold text-primary">₹{{ p.price }}</td>
+                    <td class="small">{{ p.available_slots }} / {{ p.total_slots }} Slots</td>
+                    <td>
+                        {% set now = now_date() %}
+                        {% if p.booking_end_date < now %} <span
+                            class="badge bg-danger-subtle text-danger border border-danger-subtle px-2">Closed</span>
+                            {% elif p.booking_start_date > now %}
+                            <span
+                                class="badge bg-warning-subtle text-warning border border-warning-subtle px-2">Upcoming</span>
+                            {% else %}
+                            <span
+                                class="badge bg-success-subtle text-success border border-success-subtle px-2">Active</span>
+                            {% endif %}
+                    </td>
+                    <td class="text-end pe-4">
+                        <a href="{{ url_for('admin.edit_package', id=p.id) }}"
+                            class="btn btn-sm btn-outline-secondary me-1">Edit</a>
+                        <a href="{{ url_for('admin.delete_package', id=p.id) }}" class="btn btn-sm btn-outline-danger"
+                            onclick="return confirm('Delete this package?')">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-center py-5 text-muted">No packages found.</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-set widths for progress bars
+    document.querySelectorAll('.progress-auto-width').forEach(el => {
+        el.style.width = el.getAttribute('data-width');
+    });
+</script>
+{% endblock %}

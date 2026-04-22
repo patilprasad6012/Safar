@@ -1,0 +1,392 @@
+{% extends 'user_base.html' %}
+
+{% block user_extra_css %}
+<style>
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+
+    .header-title h2 {
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0;
+    }
+
+    .header-title p {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        margin: 5px 0 0 0;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 12px;
+    }
+
+    .btn-action {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        padding: 10px 20px;
+        border-radius: 10px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--text-dark);
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+    .btn-action:hover {
+        background: var(--dashboard-bg);
+        border-color: var(--accent-purple);
+        transform: translateY(-2px);
+    }
+
+    /* Hero Card */
+    .hero-card {
+        background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
+        border-radius: 24px;
+        padding: 40px;
+        color: white;
+        margin-bottom: 30px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-card h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 15px;
+    }
+
+    .hero-card p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        margin-bottom: 25px;
+        max-width: 600px;
+    }
+
+    .hero-stats-pill {
+        display: inline-block;
+        background: rgba(255, 255, 255, 0.2);
+        padding: 6px 16px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .hero-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+    }
+
+    .btn-hero {
+        padding: 12px 25px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        text-decoration: none;
+        transition: transform 0.2s;
+    }
+
+    .btn-hero:hover {
+        transform: translateY(-2px);
+    }
+
+    .btn-hero-white {
+        background: white;
+        color: var(--accent-indigo);
+    }
+
+    .btn-hero-outline {
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        color: white;
+    }
+
+    /* Stat Grid */
+    .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 25px;
+        margin-bottom: 30px;
+    }
+
+    .stat-card {
+        background: var(--card-bg);
+        border-radius: 20px;
+        padding: 25px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .stat-info h3 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin: 0;
+        color: var(--text-dark);
+    }
+
+    .stat-info p {
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin: 0;
+    }
+
+    /* Bottom Content Grid */
+    .bottom-grid {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 25px;
+    }
+
+    @media (max-width: 1199px) {
+        .bottom-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .content-card {
+        background: var(--card-bg);
+        border-radius: 20px;
+        border: 1px solid var(--border-color);
+        overflow: hidden;
+    }
+
+    .card-head {
+        padding: 20px 25px;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .card-head h4 {
+        font-weight: 700;
+        margin: 0;
+        color: var(--text-dark);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .card-body-custom {
+        padding: 25px;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+        color: var(--text-muted);
+    }
+</style>
+{% endblock %}
+
+{% block user_content %}
+<div class="dashboard-header d-flex justify-content-between align-items-center mb-4">
+    <div class="header-title">
+        <h2 class="fw-bold text-dark m-0">Dashboard Overview</h2>
+        <p class="text-muted small m-0">Welcome to your personalized Safar workspace.</p>
+    </div>
+    <div class="header-actions d-flex gap-2">
+        <a href="{{ url_for('user.recommend') }}" class="btn-action border-primary-subtle shadow-sm px-3">
+            <i data-lucide="gift" size="18" class="text-primary"></i> Trip Offers
+        </a>
+        <a href="{{ url_for('user.profile') }}" class="btn-action border-success-subtle shadow-sm px-3">
+            <i data-lucide="user-check" size="18" class="text-success"></i> Complete Profile
+        </a>
+    </div>
+</div>
+
+<!-- Welcome Hero Section -->
+<div class="hero-card shadow-sm">
+    <h1>Welcome back, {{ session['username'].split(' ')[0] }}! 👋</h1>
+    <p>Your journey with Safar is progressing beautifully. You currently have <span class="hero-stats-pill">{{ bookings|length }} active bookings</span> waiting for your expertise.</p>
+    
+    <div class="hero-actions d-flex gap-3 mt-4">
+        <a href="{{ url_for('packages') }}" class="btn-hero btn-hero-white">
+            <i data-lucide="plane"></i> View Destinations
+        </a>
+        <a href="{{ url_for('user.support') }}" class="btn-hero btn-hero-outline">
+            <i data-lucide="calendar"></i> Check Status
+        </a>
+    </div>
+</div>
+
+<!-- Stats Grid -->
+<div class="stat-grid mt-5">
+    <!-- Packages Booked (Requested Design) -->
+    <a href="#bookings-section" class="stat-card text-decoration-none transition-all">
+        <div class="d-flex flex-column gap-4 w-100">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="stat-icon" style="background: #eef2ff; border-radius: 18px; width: 56px; height: 56px; color: #2563eb;">
+                    <i data-lucide="briefcase" size="24"></i>
+                </div>
+                <div class="stat-info">
+                    <p style="font-size: 0.75rem; font-weight: 800; color: #475569; line-height: 1.2; letter-spacing: 0.5px;">PACKAGES<br>BOOKED</p>
+                </div>
+                <div class="ms-auto">
+                    <i data-lucide="arrow-right" size="20" style="color: #93c5fd;"></i>
+                </div>
+            </div>
+            <div>
+                <h3 style="font-size: 2.8rem; font-weight: 800; color: #1e293b; margin: 0; line-height: 1;">{{ confirmed_bookings }}</h3>
+                <p style="color: #64748b; font-size: 1rem; font-weight: 500; margin-top: 10px;">Total successful bookings made</p>
+            </div>
+        </div>
+    </a>
+
+    <!-- Active Waitlist / Pending -->
+    <a href="#bookings-section" class="stat-card text-decoration-none transition-all">
+        <div class="d-flex flex-column gap-4 w-100">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="stat-icon" style="background: #fffbeb; border-radius: 18px; width: 56px; height: 56px; color: #d97706;">
+                    <i data-lucide="clock" size="24"></i>
+                </div>
+                <div class="stat-info">
+                    <p style="font-size: 0.75rem; font-weight: 800; color: #475569; line-height: 1.2; letter-spacing: 0.5px;">WAITING<br>APPROVAL</p>
+                </div>
+                <div class="ms-auto">
+                    <i data-lucide="chevron-right" size="20" style="color: #fcd34d;"></i>
+                </div>
+            </div>
+            <div>
+                <h3 style="font-size: 2.8rem; font-weight: 800; color: #1e293b; margin: 0; line-height: 1;">{{ pending_bookings }}</h3>
+                <p style="color: #64748b; font-size: 1rem; font-weight: 500; margin-top: 10px;">Bookings pending verification</p>
+            </div>
+        </div>
+    </a>
+
+    <!-- Safar Points -->
+    <div class="stat-card">
+        <div class="d-flex flex-column gap-4 w-100">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="stat-icon" style="background: #f0fdf4; border-radius: 18px; width: 56px; height: 56px; color: #16a34a;">
+                    <i data-lucide="award" size="24"></i>
+                </div>
+                <div class="stat-info">
+                    <p style="font-size: 0.75rem; font-weight: 800; color: #475569; line-height: 1.2; letter-spacing: 0.5px;">SAFAR<br>POINTS</p>
+                </div>
+                <div class="ms-auto">
+                    <i data-lucide="sparkles" size="20" style="color: #86efac;"></i>
+                </div>
+            </div>
+            <div>
+                <h3 style="font-size: 2.8rem; font-weight: 800; color: #1e293b; margin: 0; line-height: 1;">{{ confirmed_bookings * 50 }}</h3>
+                <p style="color: #64748b; font-size: 1rem; font-weight: 500; margin-top: 10px;">Loyalty points earned so far</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bottom Content Grid -->
+<div class="bottom-grid">
+    <!-- Left Profile Snippet -->
+    <div class="content-card">
+        <div class="card-body-custom text-center">
+            <div class="bg-primary-subtle text-primary rounded-circle mx-auto mb-4 d-flex align-items-center justify-content-center fw-bold" style="width: 100px; height: 100px; font-size: 2.5rem;">
+                {{ session['username'][0].upper() }}
+            </div>
+            <h3 class="fw-bold text-dark">{{ session['username'] }}</h3>
+            <span class="badge bg-primary-subtle text-primary px-3 py-2 mb-4">VERIFIED TRAVELER</span>
+            
+            <div class="text-start mt-4">
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted small">MEMBER SINCE</span>
+                    <span class="text-dark fw-bold small">2026</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span class="text-muted small">TRAVELER ID</span>
+                    <span class="text-dark fw-bold small">#{{ session['traveler_id'] }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notice Board / Recent Activity -->
+    <div class="content-card" id="bookings-section">
+        <div class="card-head">
+            <h4><i data-lucide="megaphone" class="text-primary"></i> My Bookings History</h4>
+            <a href="{{ url_for('user.my_bookings') }}" class="text-decoration-none small">View All <i data-lucide="chevron-right" size="14"></i></a>
+        </div>
+        <div class="card-body-custom">
+            {% if bookings %}
+                <div class="table-responsive">
+                    <table class="table table-borderless align-middle m-0">
+                        <thead>
+                            <tr class="text-muted small border-bottom">
+                                <th class="pb-3">TRIP</th>
+                                <th class="pb-3">STATUS</th>
+                                <th class="pb-3 text-end">DATE</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for b in bookings[:3] %}
+                            <tr class="border-bottom-last-none">
+                                <td class="py-3">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="bg-light rounded-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                            <i data-lucide="map" size="18" class="text-primary"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold text-dark small">{{ b.title }}</div>
+                                            <div class="text-muted" style="font-size: 0.7rem;">{{ b.destination }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-3">
+                                    {% if b.status == 'confirmed' %}
+                                        <span class="badge bg-success-subtle text-success">Confirmed</span>
+                                    {% else %}
+                                        <span class="badge bg-warning-subtle text-warning">Pending</span>
+                                    {% endif %}
+                                </td>
+                                <td class="py-3 text-end">
+                                    <div class="d-flex align-items-center justify-content-end gap-3">
+                                        <div class="small text-muted">{{ b.booking_date.strftime('%d %b') }}</div>
+                                        <a href="{{ url_for('user.my_bookings') }}#desc-{{ b.id }}" class="btn btn-sm btn-light rounded-circle shadow-sm" title="View Details">
+                                            <i data-lucide="eye" size="14"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <i data-lucide="inbox" size="48" class="mb-3 opacity-25"></i>
+                    <p>No new notifications or active travel updates.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

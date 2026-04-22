@@ -1,0 +1,167 @@
+{% extends "user_base.html" %}
+
+{% block title %}AI Travel Recommendations - Safar{% endblock %}
+
+{% block user_extra_css %}
+<style>
+    .glass-card {
+        background: white;
+        border: 1px solid #f1f5f9;
+        border-radius: 20px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+    
+    .magic-icon {
+        background: linear-gradient(135deg, var(--accent-purple), var(--accent-indigo));
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    .ai-response {
+        background-color: #f8fafc;
+        border-left: 4px solid var(--accent-indigo);
+        border-radius: 12px;
+        padding: 2rem;
+        font-size: 1.05rem;
+        line-height: 1.6;
+        color: #1e293b;
+    }
+
+    .form-label {
+        color: #64748b;
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .form-control, .form-select, .input-group-text {
+        border-radius: 12px !important;
+        border-color: #e2e8f0;
+        padding: 12px 15px;
+    }
+
+    .btn-magic {
+        background: linear-gradient(135deg, var(--accent-purple), var(--accent-indigo));
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        padding: 15px 30px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-magic:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(168, 85, 247, 0.2);
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block user_content %}
+<div class="dashboard-header mb-4">
+    <div class="header-title">
+        <h2 class="d-flex align-items-center gap-2">
+            <i data-lucide="sparkles" class="magic-icon"></i> AI Recommendations
+        </h2>
+        <p>Tell our smart assistant what you're looking for, and we'll match you with the perfect trip!</p>
+    </div>
+</div>
+
+<div class="glass-card p-4 p-md-5 mb-5">
+    <form method="POST" action="{{ url_for('user.recommend') }}" id="recommendationForm">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <label class="form-label">Your Budget (INR)</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i data-lucide="indian-rupee" size="18"></i></span>
+                    <input type="number" name="budget" class="form-control" placeholder="e.g. 50000" required value="{{ request.form.get('budget', '') }}">
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <label class="form-label">Preferred Location</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i data-lucide="map-pin" size="18"></i></span>
+                    <input type="text" name="location" class="form-control" placeholder="e.g. Beach, Mountains, Europe..." required value="{{ request.form.get('location', '') }}">
+                </div>
+            </div>
+            
+            <div class="col-12 mt-4">
+                <label class="form-label mb-3 d-block">Travel Experience Type</label>
+                <div class="d-flex flex-wrap gap-4">
+                    <div class="form-check custom-radio">
+                        <input class="form-check-input" type="radio" name="travel_type" id="typeAdventure" value="Adventure" checked>
+                        <label class="form-check-label h6 mb-0" for="typeAdventure">⛰️ Adventure</label>
+                    </div>
+                    <div class="form-check custom-radio">
+                        <input class="form-check-input" type="radio" name="travel_type" id="typeRelaxation" value="Relaxation" {% if request.form.get('travel_type') == 'Relaxation' %}checked{% endif %}>
+                        <label class="form-check-label h6 mb-0" for="typeRelaxation">🏖️ Relaxation</label>
+                    </div>
+                    <div class="form-check custom-radio">
+                        <input class="form-check-input" type="radio" name="travel_type" id="typeFamily" value="Family" {% if request.form.get('travel_type') == 'Family' %}checked{% endif %}>
+                        <label class="form-check-label h6 mb-0" for="typeFamily">👨‍👩‍👧‍👦 Family</label>
+                    </div>
+                    <div class="form-check custom-radio">
+                        <input class="form-check-input" type="radio" name="travel_type" id="typeCultural" value="Cultural" {% if request.form.get('travel_type') == 'Cultural' %}checked{% endif %}>
+                        <label class="form-check-label h6 mb-0" for="typeCultural">🏛️ Cultural</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-5 pt-4 border-top d-flex justify-content-between align-items-center">
+            <span class="small text-muted d-flex align-items-center gap-2">
+                <i data-lucide="shield-check" size="16"></i> Your preferences are analyzed privately.
+            </span>
+            <button type="submit" class="btn btn-magic d-flex align-items-center gap-2" id="submitBtn">
+                <i data-lucide="wand-2" size="20"></i> Find My Perfect Trip
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- AI Output Section -->
+{% if ai_response %}
+<div class="glass-card p-4 p-md-5" id="resultsArea">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold m-0 d-flex align-items-center gap-2 text-dark">
+            <i data-lucide="check-circle" class="text-success"></i> Top Match Results
+        </h4>
+        <button class="btn btn-sm btn-light rounded-pill" onclick="window.print()">
+            <i data-lucide="download" size="14"></i> Export Suggestions
+        </button>
+    </div>
+    <div class="ai-response text-dark shadow-sm">
+        {{ ai_response|safe }}
+    </div>
+    <div class="mt-5 text-center">
+        <a href="{{ url_for('packages') }}" class="btn-hero btn-hero-white border text-primary px-5">
+            Book From Explore Page <i data-lucide="arrow-right" size="18"></i>
+        </a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block user_extra_js %}
+<script>
+    document.getElementById('recommendationForm').addEventListener('submit', function() {
+        const btn = document.getElementById('submitBtn');
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> We are matching you...';
+        btn.classList.add('opacity-75');
+        btn.disabled = true;
+    });
+    
+    {% if ai_response %}
+    window.onload = function() {
+        const results = document.getElementById('resultsArea');
+        if (results) {
+            results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    };
+    {% endif %}
+</script>
+{% endblock %}

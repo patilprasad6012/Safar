@@ -1,0 +1,73 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}Add New Package - Admin Console{% endblock %}
+
+{% block breadcrumb %}Add New Package{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card-simple">
+            <h2 class="fw-bold mb-3">Add Travel Package</h2>
+            <p class="text-muted mb-4">Enter the details to publish a new package.</p>
+
+            <form action="{{ url_for('admin.add_package') }}" method="POST">
+                <div class="row g-3">
+                    <div class="col-md-12">
+                        <label class="form-label small fw-bold">Package Title</label>
+                        <input type="text" name="title" class="form-control" placeholder="e.g. Tropical Maldives"
+                            required>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">Destination</label>
+                        <input type="text" name="destination" class="form-control" placeholder="City, Country" required>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">Duration</label>
+                        <input type="text" name="duration" class="form-control" placeholder="e.g. 5 Days" required>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label small fw-bold">Price (₹)</label>
+                        <input type="number" step="1" name="price" class="form-control" placeholder="50000" required>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label small fw-bold">Total Slots</label>
+                        <input type="number" name="total_slots" class="form-control" placeholder="20" required>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label small fw-bold">Image URL</label>
+                        <input type="url" name="image_url" class="form-control" placeholder="https://..." required>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">Start Date</label>
+                        <input type="datetime-local" name="start_date" class="form-control" required>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">End Date</label>
+                        <input type="datetime-local" name="end_date" class="form-control" required>
+                    </div>
+
+                    <div class="col-md-12">
+                        <label class="form-label small fw-bold">Description</label>
+                        <textarea name="description" class="form-control" rows="3" placeholder="Package highlights..."
+                            required></textarea>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <a href="{{ url_for('admin.manage_packages') }}"
+                        class="btn btn-outline-secondary btn-sm px-4">Cancel</a>
+                    <button type="submit" class="btn btn-primary btn-sm px-4">Publish</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

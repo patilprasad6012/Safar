@@ -1,0 +1,81 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}Manage Bookings - Admin Console{% endblock %}
+
+{% block breadcrumb %}Booking Records{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h2 class="fw-bold m-0 text-primary">Customer Bookings</h2>
+    <p class="text-muted small">Manage traveler reservations.</p>
+</div>
+
+<div class="card-simple p-0">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="bg-light small">
+                <tr>
+                    <th class="ps-4">ID</th>
+                    <th>Traveler</th>
+                    <th>Package</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th class="text-end pe-4">Update Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if bookings %}
+                {% for b in bookings %}
+                <tr>
+                    <td class="ps-4 fw-bold">#{{ b.booking_id }}</td>
+                    <td>
+                        <div>
+                            <div class="fw-bold small">{{ b.full_name }}</div>
+                            <div class="text-muted small">ID: {{ b.traveler_id }}</div>
+                        </div>
+                    </td>
+                    <td class="small">{{ b.title }}</td>
+                    <td class="small">{{ b.booking_date.strftime('%Y-%m-%d') }}</td>
+                    <td>
+                        {% if b.status == 'confirmed' %}
+                        <span
+                            class="badge bg-success-subtle text-success border border-success-subtle px-2">Confirmed</span>
+                        {% elif b.status == 'cancelled' %}
+                        <span
+                            class="badge bg-danger-subtle text-danger border border-danger-subtle px-2">Cancelled</span>
+                        {% else %}
+                        <span
+                            class="badge bg-warning-subtle text-warning border border-warning-subtle px-2">Pending</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end pe-4">
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
+                                data-bs-toggle="dropdown">
+                                Action
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item small"
+                                        href="{{ url_for('admin.update_booking_status', id=b.id, status='confirmed') }}">Confirm</a>
+                                </li>
+                                <li><a class="dropdown-item small"
+                                        href="{{ url_for('admin.update_booking_status', id=b.id, status='pending') }}">Set
+                                        Pending</a></li>
+                                <li><a class="dropdown-item small"
+                                        href="{{ url_for('admin.update_booking_status', id=b.id, status='cancelled') }}">Cancel</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-center py-5 text-muted">No bookings found.</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

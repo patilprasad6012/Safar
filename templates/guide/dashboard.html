@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+
+{% block title %}Guide Dashboard - Safar{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold m-0 text-success">Guide Dashboard</h2>
+        <p class="text-muted small">Manage your profile and see traveler feedback.</p>
+    </div>
+    <div class="text-end">
+        <span class="badge {{ 'bg-success' if guide.is_approved else 'bg-warning text-dark' }} px-3 py-2 fs-6">
+            {{ 'APPROVED GUIDE' if guide.is_approved else 'PENDING APPROVAL' }}
+        </span>
+    </div>
+</div>
+
+<!-- Quick Stats Row -->
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="card-simple border-primary position-relative overflow-hidden h-100">
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <i data-lucide="briefcase" size="20" class="text-primary"></i>
+                <span class="text-muted small fw-bold text-uppercase">Times Hired</span>
+            </div>
+            <h2 class="fw-bold mb-0 text-primary">{{ times_hired }}</h2>
+            <div class="position-absolute opacity-10" style="right: -10px; bottom: -10px;">
+                <i data-lucide="briefcase" size="80" class="text-primary"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card-simple border-success position-relative overflow-hidden h-100">
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <i data-lucide="indian-rupee" size="20" class="text-success"></i>
+                <span class="text-muted small fw-bold text-uppercase">Total Earnings</span>
+            </div>
+            <h2 class="fw-bold mb-0 text-success">₹{{ "{:,.2f}".format(total_earnings) }}</h2>
+            <div class="position-absolute opacity-10" style="right: -10px; bottom: -10px;">
+                <i data-lucide="wallet" size="80" class="text-success"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-5">
+    <!-- Profile Edit Section -->
+    <div class="col-md-5">
+        <div class="card-simple">
+            <h5 class="fw-bold mb-3"><i data-lucide="user" class="me-2"></i>My Profile</h5>
+            
+            <form action="{{ url_for('guide.update_profile') }}" method="POST">
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Full Name</label>
+                    <input type="text" class="form-control" value="{{ guide.full_name }}" disabled>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Email</label>
+                    <input type="text" class="form-control" value="{{ guide.email }}" disabled>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Daily Rate (₹)</label>
+                    <input type="number" name="daily_rate" class="form-control fw-bold text-success" value="{{ guide.daily_rate or 0 }}" required>
+                    <div class="form-text small text-muted">This is how much travelers will pay you per day.</div>
+                </div>
+                
+                <h6 class="fw-bold mt-4 mb-2">Public Details</h6>
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Experience (Destinations, Tags)</label>
+                    <textarea name="experience" class="form-control" rows="3">{{ guide.experience }}</textarea>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label small fw-bold">Short Bio</label>
+                    <textarea name="bio" class="form-control" rows="4">{{ guide.bio }}</textarea>
+                </div>
+                
+                <button class="btn btn-outline-success w-100 fw-bold">Update Profile Details</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Assigned Bookings & Feedback Section -->
+    <div class="col-md-7">
+        <div class="d-flex flex-column gap-4">
+            
+            <!-- Assigned Bookings -->
+            <div class="card-simple">
+                <h5 class="fw-bold mb-4"><i data-lucide="users" class="me-2 text-primary"></i>Assigned Travelers</h5>
+                
+                {% if assigned_bookings %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light small">
+                            <tr>
+                                <th>Traveler Details</th>
+                                <th>Tour Package</th>
+                                <th>Booked On</th>
+                                <th class="text-end">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for b in assigned_bookings %}
+                            <tr>
+                                <td>
+                                    <div class="fw-bold text-dark">{{ b.user_name }}</div>
+                                    <div class="small text-muted"><i data-lucide="mail" size="12" class="me-1"></i>{{ b.user_email }}</div>
+                                    <div class="small text-muted"><i data-lucide="phone" size="12" class="me-1"></i>{{ b.user_phone }}</div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle">{{ b.package_title }}</span>
+                                    <div class="small text-muted mt-1">{{ b.duration }}</div>
+                                </td>
+                                <td class="small">{{ b.booking_date.strftime('%b %d, %Y') }}</td>
+                                <td class="text-end">
+                                    <span class="badge bg-success">Confirmed</span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="py-5 text-center text-muted border rounded bg-light">
+                    <i data-lucide="briefcase" class="mb-3 d-block mx-auto text-secondary" size="48" style="opacity: 0.3;"></i>
+                    You haven't been hired for any bookings yet.
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Feedback Section -->
+            <div class="card-simple">
+            <h5 class="fw-bold mb-4"><i data-lucide="message-square" class="me-2"></i>Traveler Feedback</h5>
+            
+            {% if feedbacks %}
+                <div class="list-group list-group-flush rounded border">
+                {% for f in feedbacks %}
+                    <div class="list-group-item p-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <strong class="text-dark">{{ f.user_name }}</strong>
+                            <div class="text-warning small">
+                                {% for i in range(f.rating) %}★{% endfor %}{% for i in range(5 - f.rating) %}☆{% endfor %}
+                            </div>
+                        </div>
+                        <p class="text-muted mb-1 small">{{ f.feedback_text }}</p>
+                        <div class="small text-muted" style="font-size: 0.75rem;">{{ f.created_at.strftime('%b %d, %Y') }}</div>
+                    </div>
+                {% endfor %}
+                </div>
+            {% else %}
+                <div class="py-5 text-center text-muted">
+                    <i data-lucide="inbox" class="mb-3 d-block mx-auto" size="48" style="opacity: 0.2;"></i>
+                    No feedback received yet.
+                </div>
+            {% endif %}
+            
+            <hr class="my-4">
+            
+            <div class="bg-success-subtle p-3 rounded border border-success-subtle">
+                <h6 class="fw-bold text-success mb-2">How Travelers can review you:</h6>
+                <p class="small text-muted mb-3">Copy your public feedback link and send it to travelers after a tour.</p>
+                <div class="input-group">
+                    <input type="text" disabled class="form-control bg-white" value="http://127.0.0.1:5000/guide/profile/{{ guide.id }}">
+                    <button class="btn btn-success" onclick="alert('Link copied!')">Copy Link</button>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block footer %}{% endblock %}
+
+{% block extra_js %}
+<script>
+    lucide.createIcons();
+</script>
+{% endblock %}

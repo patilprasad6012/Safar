@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket #{{ booking.booking_id }} - Safar</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        .ticket-wrapper {
+            max-width: 800px;
+            margin: 40px auto;
+        }
+        .ticket {
+            background: #fff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: relative;
+            border: 1px solid #e2e8f0;
+        }
+        .ticket-header {
+            background: #2563eb;
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .ticket-header h2 {
+            margin: 0;
+            font-weight: 700;
+        }
+        .ticket-body {
+            padding: 30px;
+        }
+        .barcode {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 2rem;
+            letter-spacing: 2px;
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px dashed #e2e8f0;
+        }
+        @media print {
+            body { background: white; }
+            .no-print { display: none !important; }
+            .ticket { box-shadow: none; border: 2px solid #000; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container ticket-wrapper">
+    <!-- Print Actions -->
+    <div class="d-flex justify-content-between mb-4 no-print">
+        <a href="{{ url_for('user.dashboard') }}" class="btn btn-outline-secondary">
+            &larr; Back to Dashboard
+        </a>
+        <button onclick="window.print()" class="btn btn-primary fw-bold">
+            <i data-lucide="printer" class="me-2" style="width: 18px; height: 18px;"></i> Print / Download PDF
+        </button>
+    </div>
+
+    <!-- The Ticket -->
+    <div class="ticket">
+        <div class="ticket-header">
+            <div class="d-flex align-items-center gap-2">
+                <i data-lucide="plane"></i>
+                <h2>Safar Boarding Pass</h2>
+            </div>
+            <div class="text-end">
+                <div class="small text-white-50">Booking Reference</div>
+                <div class="fw-bold fs-5">{{ booking.booking_id }}</div>
+            </div>
+        </div>
+        
+        <div class="ticket-body">
+            <div class="row mb-4">
+                <div class="col-sm-6 mb-3 mb-sm-0">
+                    <p class="text-muted small mb-1">Traveler Name</p>
+                    <h5 class="fw-bold">{{ booking.full_name }}</h5>
+                </div>
+                <div class="col-sm-6 text-sm-end">
+                    <p class="text-muted small mb-1">Traveler ID</p>
+                    <h5 class="fw-bold">{{ booking.traveler_id }}</h5>
+                </div>
+            </div>
+            
+            <div class="p-3 bg-light rounded border mb-4">
+                <div class="row">
+                    <div class="col-md-5">
+                        <p class="text-muted small mb-1">Package / Destination</p>
+                        <h4 class="fw-bold text-primary">{{ booking.title }}</h4>
+                        <div>{{ booking.destination }}</div>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="text-muted small mb-1">Duration</p>
+                        <div class="fw-bold fs-5">{{ booking.duration }}</div>
+                    </div>
+                    <div class="col-md-4 text-md-end">
+                        <p class="text-muted small mb-1">Amount Paid</p>
+                        <h4 class="fw-bold text-success">₹{{ booking.price }}</h4>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-sm-6">
+                    <p class="text-muted small mb-1">Booking Date</p>
+                    <div class="fw-bold">{{ booking.booking_date.strftime('%B %d, %Y') }}</div>
+                </div>
+                <div class="col-sm-6 text-sm-end">
+                    <p class="text-muted small mb-1">Status</p>
+                    <span class="badge bg-success px-3 py-2 fs-6">CONFIRMED</span>
+                </div>
+            </div>
+
+            <!-- Fake Barcode -->
+            <div class="barcode">
+                |||| ||||| ||| |||| || ||||| | ||
+                <div class="small fw-normal text-muted mt-2" style="font-family: 'Outfit', sans-serif; letter-spacing: 0;">Scan at departure</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    lucide.createIcons();
+</script>
+</body>
+</html>

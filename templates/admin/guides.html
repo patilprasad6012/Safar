@@ -1,0 +1,73 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}Manage Guides - Admin Console{% endblock %}
+
+{% block breadcrumb %}Guide Applications{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold m-0 text-primary">Guide Applications</h2>
+        <p class="text-muted small">Approve or reject local guide applications.</p>
+    </div>
+</div>
+
+<div class="card-simple p-0">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="bg-light small">
+                <tr>
+                    <th class="ps-4">ID</th>
+                    <th>Guide Info</th>
+                    <th>Experience & Bio</th>
+                    <th>Status</th>
+                    <th>Date applied</th>
+                    <th class="text-end pe-4">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for guide in guides %}
+                <tr>
+                    <td class="ps-4 fw-bold">#{{ guide.id }}</td>
+                    <td>
+                        <div class="fw-bold">{{ guide.full_name }}</div>
+                        <div class="text-muted" style="font-size: 0.75rem;">{{ guide.email }}<br>{{ guide.phone }}</div>
+                    </td>
+                    <td style="max-width: 250px;">
+                        <div class="small fw-bold text-truncate" title="{{ guide.experience }}">{{ guide.experience }}
+                        </div>
+                        <div class="text-muted small text-truncate" title="{{ guide.bio }}" style="font-size: 0.75rem;">
+                            {{ guide.bio }}</div>
+                    </td>
+                    <td>
+                        {% if guide.is_approved %}
+                        <span
+                            class="badge bg-success-subtle text-success border border-success-subtle px-2">Approved</span>
+                        {% else %}
+                        <span
+                            class="badge bg-warning-subtle text-warning border border-warning-subtle px-2">Pending</span>
+                        {% endif %}
+                    </td>
+                    <td class="small">{{ guide.created_at.strftime('%d %b %Y') }}</td>
+                    <td class="text-end pe-4">
+                        {% if not guide.is_approved %}
+                        <a href="{{ url_for('admin.approve_guide', id=guide.id) }}" class="btn btn-sm btn-success me-1"
+                            onclick="return confirm('Approve this guide application?')">Approve</a>
+                        {% endif %}
+                        <a href="{{ url_for('admin.reject_guide', id=guide.id) }}" class="btn btn-sm btn-outline-danger"
+                            onclick="return confirm('Cancel/Reject this profile completely? This cannot be undone!')">Reject</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-center py-5 text-muted">
+                        <i data-lucide="users" class="mb-3 d-block mx-auto" size="48" style="opacity: 0.2;"></i>
+                        No guide applications found.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

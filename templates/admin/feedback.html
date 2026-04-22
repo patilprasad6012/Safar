@@ -1,0 +1,105 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}Manage Feedback - Safar{% endblock %}
+
+{% block breadcrumb %}Traveler Feedback{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold m-0 text-primary">Traveler Feedback</h2>
+        <p class="text-muted small">Review and respond to submissions from users.</p>
+    </div>
+</div>
+
+<div class="card-simple shadow-sm border-0">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="bg-light">
+                <tr>
+                    <th class="ps-3">Date</th>
+                    <th>Traveler</th>
+                    <th>Subject</th>
+                    <th>Message</th>
+                    <th>Rating</th>
+                    <th>Status</th>
+                    <th class="text-end pe-3">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for f in feedbacks %}
+                <tr>
+                    <td class="ps-3"><span class="small text-muted">{{ f.created_at.strftime('%Y-%m-%d %H:%M') if
+                            f.created_at else 'N/A' }}</span></td>
+                    <td>
+                        <div class="fw-bold">{{ f.full_name }}</div>
+                        <div class="small text-muted">{{ f.email }}</div>
+                    </td>
+                    <td class="fw-bold text-dark">{{ f.subject }}</td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-light border p-1 px-2" data-bs-toggle="popover"
+                            title="Feedback Message" data-bs-content="{{ f.message }}">
+                            View Message
+                        </button>
+                    </td>
+                    <td>
+                        <div class="d-flex gap-1 text-warning">
+                            {% for i in range(f.rating) %}
+                            <i data-lucide="star" size="14"></i>
+                            {% endfor %}
+                            {% for i in range(5 - f.rating) %}
+                            <i data-lucide="star" size="14" style="opacity: 0.3;"></i>
+                            {% endfor %}
+                        </div>
+                    </td>
+                    <td>
+                        {% if f.status == 'new' %}
+                        <span class="badge bg-primary">New</span>
+                        {% elif f.status == 'read' %}
+                        <span class="badge bg-secondary">Read</span>
+                        {% elif f.status == 'resolved' %}
+                        <span class="badge bg-success">Resolved</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end pe-3">
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
+                                data-bs-toggle="dropdown">
+                                Action
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+                                <li><a class="dropdown-item"
+                                        href="{{ url_for('admin.update_feedback_status', id=f.id, status='read') }}">Mark
+                                        as Read</a></li>
+                                <li><a class="dropdown-item"
+                                        href="{{ url_for('admin.update_feedback_status', id=f.id, status='resolved') }}">Mark
+                                        as Resolved</a></li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" class="text-center text-muted py-5">
+                        <i data-lucide="message-square" size="32" class="mb-2 opacity-50"></i>
+                        <p class="mb-0">No feedback entries found.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Initialize popovers for viewing long messages
+    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+        return new bootstrap.Popover(popoverTriggerEl, {
+            trigger: 'focus'
+        })
+    })
+</script>
+{% endblock %}

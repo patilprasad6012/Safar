@@ -1,0 +1,256 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - Safar{% endblock %}
+
+{% block extra_css %}
+<link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Outfit:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
+<style>
+    body {
+        background-color: #fef8f5;
+        font-family: 'Outfit', sans-serif;
+    }
+
+    .auth-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 60px 20px;
+        /* Increased top padding to avoid navbar overlap */
+        min-height: calc(100vh - 80px);
+    }
+
+    .auth-card {
+        background: #ffffff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.05);
+        display: flex;
+        width: 100%;
+        max-width: 820px;
+        min-height: 540px;
+    }
+
+    .auth-sidebar {
+        flex: 1;
+        background: url("{{ url_for('static', filename='images/auth_travel_side.png') }}") no-repeat center center;
+        background-size: cover;
+    }
+
+    @media (max-width: 768px) {
+        .auth-sidebar {
+            display: none;
+        }
+    }
+
+    .auth-content {
+        flex: 1.1;
+        padding: 45px 55px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .logo-container {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 35px;
+    }
+
+    .logo-icon-safar {
+        color: #a855f7;
+        width: 32px;
+        height: 32px;
+    }
+
+    .logo-text {
+        font-size: 1.4rem;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+        color: #1e293b;
+        margin: 0;
+    }
+
+    .logo-subtext {
+        font-size: 0.6rem;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-left: 5px;
+        font-weight: 600;
+    }
+
+    .auth-header h1 {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.4rem;
+        color: #1a1a1a;
+        margin: 0 0 10px 0;
+        font-weight: 700;
+    }
+
+    .auth-header p {
+        color: #8c8c8c;
+        font-size: 0.85rem;
+        margin: 0 0 35px 0;
+    }
+
+    .form-label {
+        color: #b0b0b0;
+        font-size: 0.6rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .input-group-custom {
+        position: relative;
+        background-color: #ecf3ff;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        padding: 0 15px;
+        height: 48px;
+        margin-bottom: 25px;
+        transition: all 0.2s ease;
+    }
+
+    .input-group-custom:focus-within {
+        background-color: #f5f3ff;
+        box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.15);
+    }
+
+    .input-group-custom i {
+        color: #94a3b8;
+        width: 18px;
+        height: 18px;
+        margin-right: 12px;
+        flex-shrink: 0;
+    }
+
+    .form-control-custom {
+        flex: 1;
+        background: transparent !important;
+        border: none !important;
+        padding: 0 !important;
+        font-size: 0.85rem;
+        color: #1e293b;
+        height: 100%;
+        outline: none !important;
+    }
+
+    .btn-signin {
+        background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
+        color: white;
+        border: none;
+        border-radius: 30px;
+        padding: 14px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        width: 100%;
+        margin-top: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+    }
+
+    .btn-signin:hover {
+        opacity: 0.95;
+        transform: translateY(-1px);
+    }
+
+    .auth-footer-links {
+        margin-top: 30px;
+        font-size: 0.75rem;
+        color: #9ca3af;
+        text-align: center;
+    }
+
+    .auth-footer-links a {
+        color: #1a1a1a;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    .back-home {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin-top: 25px;
+        color: #9ca3af;
+        text-decoration: none;
+        font-size: 0.75rem;
+        justify-content: center;
+    }
+
+    .back-home:hover {
+        color: #1e293b;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-sidebar"></div>
+        <div class="auth-content">
+            <div class="logo-container">
+                <svg class="logo-icon-safar" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2 13 L30 2 L12 16 Z" fill="currentColor" stroke="#fff" stroke-width="0.5" />
+                    <path d="M12 16 L30 2 L23 30 Z" fill="currentColor" opacity="0.85" />
+                    <path d="M12 16 L19 23 L11 28 Z" fill="currentColor" opacity="0.65" />
+                </svg>
+                <h2 class="logo-text">Safar<span class="logo-subtext">Travel System</span></h2>
+            </div>
+
+            <!-- Navigation Removed -->
+
+            <div class="auth-header">
+                <h1>Start Your Journey</h1>
+                <p>Login to explore your next destination.</p>
+            </div>
+
+            <form action="{{ url_for('auth.login') }}" method="POST">
+
+                <label class="form-label">Email Address</label>
+                <div class="input-group-custom">
+                    <i data-lucide="mail"></i>
+                    <input type="email" name="email" class="form-control-custom" placeholder="explorer@travel.com"
+                        required autocomplete="email">
+                </div>
+
+                <label class="form-label">Password</label>
+                <div class="input-group-custom">
+                    <i data-lucide="lock"></i>
+                    <input type="password" name="password" class="form-control-custom" placeholder="••••••••" required
+                        autocomplete="current-password">
+                </div>
+
+                <div class="text-end mb-3" style="margin-top: -15px;">
+                    <a href="{{ url_for('auth.forgot_password') }}" class="small text-muted text-decoration-none">Forgot
+                        password?</a>
+                </div>
+
+                <button type="submit" class="btn-signin">Login</button>
+            </form>
+
+            <div class="auth-footer-links">
+                New traveler? <a href="{{ url_for('auth.register') }}">Create an Account</a>
+            </div>
+
+            <a href="/" class="back-home">
+                <i data-lucide="arrow-left" size="14"></i> Home
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    lucide.createIcons();
+</script>
+{% endblock %}

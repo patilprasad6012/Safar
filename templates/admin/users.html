@@ -1,0 +1,65 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}Manage Travelers - Admin Console{% endblock %}
+
+{% block breadcrumb %}Travelers List{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-5">
+    <div>
+        <h2 class="fw-bold m-0"><i data-lucide="users" class="me-2 text-primary"></i> Registered Travelers</h2>
+        <p class="text-secondary small">View and manage traveler accounts</p>
+    </div>
+</div>
+
+<div class="glass p-4">
+    <div class="table-responsive">
+        <table class="table table-dark table-hover align-middle mb-0">
+            <thead class="text-secondary text-uppercase small">
+                <tr>
+                    <th>Traveler ID</th>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Verification</th>
+                    <th>Joined Date</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if users %}
+                {% for u in users %}
+                <tr>
+                    <td class="fw-bold text-accent">{{ u.traveler_id }}</td>
+                    <td class="fw-bold">{{ u.full_name }}</td>
+                    <td>{{ u.email }}</td>
+                    <td>{{ u.phone }}</td>
+                    <td>
+                        {% if u.is_verified %}
+                        <span class="badge bg-success-subtle text-success">Verified</span>
+                        {% else %}
+                        <span class="badge bg-warning-subtle text-warning text-dark">Unverified</span>
+                        {% endif %}
+                    </td>
+                    <td class="small">{{ u.created_at.strftime('%Y-%m-%d') }}</td>
+                    <td class="text-end">
+                        <a href="{{ url_for('admin.delete_user', id=u.id) }}"
+                            class="btn btn-outline-danger btn-sm p-1 px-2 border-opacity-10"
+                            onclick="return confirm('Delete this user account?')">
+                            <i data-lucide="user-minus" size="16"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="7" class="text-center py-5 text-secondary">
+                        No travelers registered yet.
+                    </td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
